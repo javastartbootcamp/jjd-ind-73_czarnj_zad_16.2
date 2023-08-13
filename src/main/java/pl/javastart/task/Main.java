@@ -4,6 +4,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -13,11 +14,11 @@ public class Main {
             DateTimeFormatter.ofPattern("d.MM.yyyy HH:mm:ss"));
     private static final List<DateTimeFormatter> DATE_PATTERNS = List.of(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     private static final DateTimeFormatter DISPLAYED_DATE_PATTERN = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private static final Map<String, ZoneId> ZONES = Map.ofEntries(Map.entry("Czas lokalny", ZoneId.systemDefault()),
-            Map.entry("UTC", ZoneId.of("UTC")),
-            Map.entry("Londyn", ZoneId.of("Europe/London")),
-            Map.entry("Los Angeles", ZoneId.of("America/Los_Angeles")),
-            Map.entry("Sydney", ZoneId.of("Australia/Sydney")));
+    private Map<String, ZoneId> zones;
+
+    public Main() {
+        this.zones = createZonesMap();
+    }
 
     public static void main(String[] args) {
         Main main = new Main();
@@ -41,8 +42,8 @@ public class Main {
 
     private void showTime(LocalDateTime dateTime) {
         ZonedDateTime local = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
-        for (String zone : ZONES.keySet()) {
-            String zonedDate = getZonedFormattedDate(local, ZONES.get(zone));
+        for (String zone : zones.keySet()) {
+            String zonedDate = getZonedFormattedDate(local, zones.get(zone));
             System.out.printf("%s: %s%n", zone, zonedDate);
         }
     }
@@ -87,5 +88,15 @@ public class Main {
         } catch (DateTimeParseException ex) {
             return false;
         }
+    }
+
+    private Map<String, ZoneId> createZonesMap() {
+        Map<String, ZoneId> zones = new LinkedHashMap<>();
+        zones.put("Czas lokalny", ZoneId.systemDefault());
+        zones.put("UTC", ZoneId.of("UTC"));
+        zones.put("Londyn", ZoneId.of("Europe/London"));
+        zones.put("Los Angeles", ZoneId.of("America/Los_Angeles"));
+        zones.put("Sydney", ZoneId.of("Australia/Sydney"));
+        return zones;
     }
 }
